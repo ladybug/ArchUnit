@@ -171,7 +171,10 @@ public interface CanBeAnnotated {
                                                             Set<String> visitedAnnotations,
                                                             DescribedPredicate<? super JavaAnnotation<?>> predicate) {
 
-            visitedAnnotations.add(annotation.getRawType().getName());
+            if (!visitedAnnotations.add(annotation.getRawType().getName())) {
+                return false;
+            }
+
             Set<JavaAnnotation<JavaClass>> metaAnnotations = annotation.getRawType().getAnnotations();
 
             if (isAnnotatedWith(metaAnnotations, predicate)) {
@@ -179,10 +182,7 @@ public interface CanBeAnnotated {
             }
 
             for (JavaAnnotation<?> metaAnnotation : metaAnnotations) {
-                if (visitedAnnotations.contains(metaAnnotation.getRawType().getName())) {
-                    return false;
-                }
-                else if (isNonCyclicMetaAnnotatedWith(metaAnnotation, visitedAnnotations, predicate)) {
+                if (isNonCyclicMetaAnnotatedWith(metaAnnotation, visitedAnnotations, predicate)) {
                     return true;
                 }
             }
