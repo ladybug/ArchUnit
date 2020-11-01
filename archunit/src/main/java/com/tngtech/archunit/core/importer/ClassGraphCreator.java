@@ -175,20 +175,11 @@ class ClassGraphCreator implements ImportContext {
         JavaClass javaClassOfAnnotation = classes.getOrResolve(annotation);
         for (JavaAnnotationBuilder metaAnnotation : importRecord.getAnnotationsFor(javaClassOfAnnotation.getName())) {
             String metaAnnotationName = metaAnnotation.getTypeDescriptor().getFullyQualifiedClassName();
-            if (isAlreadyImported(metaAnnotationName)) {
+            if (classes.isPresent(metaAnnotationName)) {
                 break;
             }
             resolveAnnotations(metaAnnotationName);
         }
-    }
-
-    private boolean isAlreadyImported(String annotation) {
-        for (JavaClass javaClass : classes.getAllWithOuterClassesSortedBeforeInnerClasses()) {
-            if (javaClass.getFullName().equals(annotation)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void resolveAndCompleteMemberAnnotations(JavaMember member) {
