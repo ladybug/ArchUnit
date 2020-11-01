@@ -160,13 +160,8 @@ public interface CanBeAnnotated {
                 DescribedPredicate<? super JavaAnnotation<?>> predicate) {
 
             for (JavaAnnotation<?> annotation : annotations) {
-                if (annotation.getRawType().isAnnotatedWith(predicate)) {
+                if (isNonCyclicMetaAnnotatedWith(annotation, new HashSet<String>(), predicate)) {
                     return true;
-                } else {
-                    Set<String> visitedAnnotations = new HashSet<>();
-                    if (isNonCyclicMetaAnnotatedWith(annotation, visitedAnnotations, predicate)) {
-                        return true;
-                    }
                 }
             }
             return false;
