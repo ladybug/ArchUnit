@@ -27,7 +27,6 @@ import com.tngtech.archunit.base.ArchUnitException.InvalidSyntaxUsageException;
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.base.Function;
 import com.tngtech.archunit.core.domain.JavaAnnotation;
-import com.tngtech.archunit.core.domain.JavaClass;
 
 import static com.tngtech.archunit.PublicAPI.Usage.ACCESS;
 import static com.tngtech.archunit.base.DescribedPredicate.equalTo;
@@ -175,14 +174,8 @@ public interface CanBeAnnotated {
                 return false;
             }
 
-            Set<JavaAnnotation<JavaClass>> metaAnnotations = annotation.getRawType().getAnnotations();
-
-            if (isAnnotatedWith(metaAnnotations, predicate)) {
-                return true;
-            }
-
-            for (JavaAnnotation<?> metaAnnotation : metaAnnotations) {
-                if (isNonCyclicMetaAnnotatedWith(metaAnnotation, visitedAnnotations, predicate)) {
+            for (JavaAnnotation<?> metaAnnotation : annotation.getRawType().getAnnotations()) {
+                if (predicate.apply(metaAnnotation) || isNonCyclicMetaAnnotatedWith(metaAnnotation, visitedAnnotations, predicate)) {
                     return true;
                 }
             }
