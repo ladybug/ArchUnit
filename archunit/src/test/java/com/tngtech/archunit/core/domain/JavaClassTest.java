@@ -954,10 +954,12 @@ public class JavaClassTest {
     @Test
     public void cyclic_annotations_are_not_searched_through_other_annotations_infinitely() {
         JavaClass javaClass = importClasses(ClassWithCyclicMetaAnnotation.class,
-                AnnotationWithCyclicAnnotation.class,
+                AnnotationWithCyclicAnnotation.class, MetaAnnotationWithCyclicAnnotation.class,
                 Retention.class).get(ClassWithCyclicMetaAnnotation.class);
 
-        assertThat(javaClass.isMetaAnnotatedWith(UnusedAnnotation.class)).isFalse();
+        assertThat(javaClass.isMetaAnnotatedWith(Deprecated.class)).isFalse();
+        assertThat(javaClass.isMetaAnnotatedWith(Retention.class)).isTrue();
+        assertThat(javaClass.isMetaAnnotatedWith(MetaAnnotationWithCyclicAnnotation.class)).isTrue();
     }
 
     private JavaClass getOnlyClassSettingField(JavaClasses classes, final String fieldName) {
@@ -1492,15 +1494,18 @@ public class JavaClassTest {
         ANNOTATION_ARRAY_PARAMETER
     }
 
+    @AnnotationWithCyclicAnnotation
     @Retention(RUNTIME)
+    @interface MetaAnnotationWithCyclicAnnotation {
+    }
+
+    @AnnotationWithCyclicAnnotation
+    @MetaAnnotationWithCyclicAnnotation
     @interface AnnotationWithCyclicAnnotation {
     }
 
     @AnnotationWithCyclicAnnotation
     private static class ClassWithCyclicMetaAnnotation {
-    }
-
-    @interface UnusedAnnotation {
     }
 
     @SuppressWarnings("ALL")
